@@ -111,6 +111,15 @@ CREATE POLICY "본인 로그만 조회"
   USING (auth.uid() = user_id);
 
 -- =============================================
+-- 롤 권한 부여 (GRANT)
+-- SQL Editor로 직접 생성 시 자동 부여되지 않음
+-- =============================================
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.face_embeddings TO authenticated;
+GRANT SELECT, INSERT ON public.auth_logs TO authenticated;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
+-- =============================================
 -- 얼굴 유사도 검색 함수 (pgvector)
 -- =============================================
 CREATE OR REPLACE FUNCTION public.match_face(
