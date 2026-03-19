@@ -47,17 +47,13 @@ export function FaceOverlay({
       <div className="absolute inset-0 bg-black/30" />
 
       {/* 얼굴 가이드 타원 */}
-      <div className="relative z-10 flex flex-col items-center gap-6">
+      <div className="relative z-10 flex flex-col items-center gap-3">
         <div
           className={cn(
-            'w-56 h-72 rounded-full border-4 transition-colors duration-300',
+            'w-40 h-52 rounded-full border-4 transition-colors duration-300',
             overlayColor
           )}
-          style={{
-            boxShadow: detected && qualityOk
-              ? `0 0 0 9999px rgba(0,0,0,0.45)`
-              : `0 0 0 9999px rgba(0,0,0,0.45)`,
-          }}
+          style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)' }}
         >
           {/* 스캔 애니메이션 */}
           {detected && qualityOk && !liveness?.passed && (
@@ -69,32 +65,17 @@ export function FaceOverlay({
           {/* 인식 완료 체크 */}
           {liveness?.passed && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-success text-6xl">✓</div>
+              <div className="text-success text-5xl">✓</div>
             </div>
           )}
         </div>
 
         {/* 상태 메시지 */}
-        <div className="bg-black/60 backdrop-blur-sm rounded-full px-5 py-2">
-          <p className="text-white text-sm text-center font-medium">
+        <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-1.5">
+          <p className="text-white text-xs text-center font-medium">
             {message}
           </p>
         </div>
-
-        {/* 라이브니스 진행 표시 */}
-        {liveness && !liveness.passed && (
-          <div className="flex gap-2">
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                className={cn(
-                  'w-3 h-3 rounded-full transition-colors duration-300',
-                  i < liveness.blinkCount ? 'bg-success' : 'bg-white/40'
-                )}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

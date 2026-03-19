@@ -75,23 +75,48 @@ export function VerifyFlow() {
     <div className="min-h-screen bg-gray-950 flex flex-col">
       {/* 라이브니스 + 감지 화면 */}
       {step === 'liveness' && (
-        <div className="relative flex-1">
-          <CameraView
-            videoRef={videoRef}
-            status={status}
-            error={error}
-            onStart={startCamera}
-            className="absolute inset-0"
-          />
-          <FaceOverlay
-            detection={result}
-            liveness={liveness}
-            isLoading={isLoading}
-          />
-          {/* 상단 안내 */}
-          <div className="absolute top-6 left-0 right-0 flex justify-center">
-            <div className="bg-black/60 backdrop-blur-sm rounded-full px-5 py-2">
-              <p className="text-white text-sm font-medium">얼굴 인증</p>
+        <div className="flex flex-col items-center p-6 gap-5 flex-1">
+          {/* 헤더 */}
+          <div className="w-full flex items-center justify-between">
+            <button
+              onClick={() => { stopCamera(); router.back(); }}
+              className="text-gray-400 text-sm px-3 py-1 rounded-lg hover:bg-white/10"
+            >
+              ← 뒤로
+            </button>
+            <h2 className="text-white font-semibold">얼굴 인증</h2>
+            <div className="w-16" />
+          </div>
+
+          {/* 카메라 박스 */}
+          <div className="relative w-full max-w-xs rounded-3xl overflow-hidden bg-black"
+               style={{ aspectRatio: '3/4' }}>
+            <CameraView
+              videoRef={videoRef}
+              status={status}
+              error={error}
+              onStart={startCamera}
+              className="absolute inset-0"
+            />
+            <FaceOverlay
+              detection={result}
+              liveness={liveness}
+              isLoading={isLoading}
+            />
+          </div>
+
+          {/* 라이브니스 안내 */}
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">{liveness.message}</p>
+            <div className="flex justify-center gap-2 mt-2">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
+                    i < liveness.blinkCount ? 'bg-primary-500' : 'bg-white/20'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>

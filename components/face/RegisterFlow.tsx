@@ -104,29 +104,55 @@ export function RegisterFlow() {
 
       {/* 캡처 화면 */}
       {step === 'capturing' && (
-        <div className="relative flex-1">
-          <CameraView
-            videoRef={videoRef}
-            status={status}
-            error={error}
-            onStart={startCamera}
-            className="absolute inset-0"
-          />
-          <FaceOverlay
-            detection={result}
-            isLoading={isLoading}
-            statusMessage={
-              result?.detected
-                ? `데이터 수집 중... (${sampleCount}/${REQUIRED_SAMPLES})`
-                : undefined
-            }
-          />
-          {/* 진행률 바 */}
-          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
-            <div
-              className="h-full bg-primary-500 transition-all duration-300"
-              style={{ width: `${progress}%` }}
+        <div className="flex flex-col items-center p-6 gap-5 flex-1">
+          {/* 헤더 */}
+          <div className="w-full flex items-center justify-between">
+            <button
+              onClick={() => { stopCamera(); setStep('guide'); }}
+              className="text-gray-400 text-sm px-3 py-1 rounded-lg hover:bg-white/10"
+            >
+              ← 뒤로
+            </button>
+            <h2 className="text-white font-semibold">얼굴 등록</h2>
+            <div className="w-16" />
+          </div>
+
+          {/* 카메라 박스 */}
+          <div className="relative w-full max-w-xs rounded-3xl overflow-hidden bg-black"
+               style={{ aspectRatio: '3/4' }}>
+            <CameraView
+              videoRef={videoRef}
+              status={status}
+              error={error}
+              onStart={startCamera}
+              className="absolute inset-0"
             />
+            <FaceOverlay
+              detection={result}
+              isLoading={isLoading}
+              statusMessage={
+                result?.detected
+                  ? `수집 중... (${sampleCount}/${REQUIRED_SAMPLES})`
+                  : undefined
+              }
+            />
+            {/* 진행률 바 */}
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
+              <div
+                className="h-full bg-primary-500 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* 안내 텍스트 */}
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">
+              얼굴을 원 안에 맞추고 정면을 바라봐 주세요
+            </p>
+            <p className="text-primary-400 text-xs mt-1">
+              샘플 {sampleCount} / {REQUIRED_SAMPLES} 수집됨
+            </p>
           </div>
         </div>
       )}
