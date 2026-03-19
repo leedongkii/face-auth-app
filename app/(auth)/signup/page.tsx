@@ -1,17 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 export default function SignupPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +19,7 @@ export default function SignupPage() {
 
     try {
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signUp({
+      const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -31,12 +30,18 @@ export default function SignupPage() {
 
       if (authError) throw authError;
 
-      // 이메일 확인 필요 시 안내 (Supabase 설정에 따라)
-      router.push('/dashboard');
+      // identities가 비어있으면 이미 가입된 이메일
+      if (data.user && data.user.identities?.length === 0) {
+        setError('이미 등록된 이메일입니다.');
+        return;
+      }
+
+      // 이메일 확인 대기 화면으로 전환
+      setDone(true);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
       setError(
-        msg.includes('already registered')
+        msg.includes('already registered') || msg.includes('already been registered')
           ? '이미 등록된 이메일입니다.'
           : msg
       );
@@ -44,6 +49,38 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+
+  // 이메일 확인 안내 화면
+  if (done) {
+    return (
+      <main className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-sm flex flex-col items-center gap-6 text-white text-center">
+          <div className="w-20 h-20 rounded-full bg-primary-600/20 flex items-center justify-center text-4xl">
+            ✉️
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">이메일을 확인해 주세요</h2>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              <span className="text-white font-medium">{email}</span>로<br />
+              인증 링크를 보냈습니다.<br />
+              이메일의 링크를 클릭하면 로그인할 수 있습니다.
+            </p>
+          </div>
+          <div className="w-full bg-white/5 rounded-2xl p-4 text-sm text-gray-400 text-left space-y-1">
+            <p>📌 이메일이 오지 않는 경우:</p>
+            <p className="pl-4">• 스팸 메일함을 확인해 주세요</p>
+            <p className="pl-4">• 몇 분 후 다시 시도해 주세요</p>
+          </div>
+          <Link
+            href="/login"
+            className="w-full py-4 bg-primary-600 rounded-2xl font-semibold text-center"
+          >
+            로그인 페이지로
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">

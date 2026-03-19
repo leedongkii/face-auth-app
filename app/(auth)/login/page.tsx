@@ -28,10 +28,13 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '로그인에 실패했습니다.';
-      setError(msg === 'Invalid login credentials'
-        ? '이메일 또는 비밀번호가 올바르지 않습니다.'
-        : msg
-      );
+      const translated =
+        msg === 'Invalid login credentials'
+          ? '이메일 또는 비밀번호가 올바르지 않습니다.'
+          : msg.includes('Email not confirmed')
+          ? '이메일 인증이 필요합니다. 가입 시 받은 이메일의 링크를 클릭해 주세요.'
+          : msg;
+      setError(translated);
     } finally {
       setLoading(false);
     }
