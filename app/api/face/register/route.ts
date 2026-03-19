@@ -10,8 +10,11 @@ export async function POST(request: Request) {
 
     // 세션 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+    if (authError) {
+      return NextResponse.json({ error: `인증 오류: ${authError.message}` }, { status: 401 });
+    }
+    if (!user) {
+      return NextResponse.json({ error: '로그인이 필요합니다. 세션이 만료되었을 수 있습니다.' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -51,7 +54,7 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error('face_embeddings insert error:', insertError);
       return NextResponse.json(
-        { error: '얼굴 등록에 실패했습니다.' },
+        { error: `얼굴 등록에 실패했습니다. (${insertError.code}: ${insertError.message})` },
         { status: 500 }
       );
     }
