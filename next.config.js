@@ -1,11 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
-    // face-api.js에서 사용하는 canvas 모듈을 서버사이드에서 무시
+  webpack: (config, { isServer }) => {
+    // face-api.js / TensorFlow 서버사이드 Node 모듈 무시
     config.resolve.alias = {
       ...config.resolve.alias,
       canvas: false,
     };
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        encoding: false,
+      };
+    }
     return config;
   },
   async headers() {
